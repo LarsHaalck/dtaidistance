@@ -29,6 +29,17 @@ def test_distance1_b():
         s2 = np.array([[0, 0], [2, 1], [0, 1], [0, .5], [0, 0]], dtype=np.double)
         d1 = dtw_ndim.distance_fast(s1, s2)
         # print(d1)
+        assert d1 == pytest.approx(1.118033988749895)
+
+
+@numpyonly
+def test_warping_paths_c():
+    with util_numpy.test_uses_numpy() as np:
+        s1 = np.array([[0, 0], [0, 1], [2, 1], [0, 1],  [0, 0]], dtype=np.double)
+        s2 = np.array([[0, 0], [2, 1], [0, 1], [0, .5], [0, 0]], dtype=np.double)
+        d1 = dtw_ndim.distance(s1, s2)
+        d1p, paths = dtw_ndim.warping_paths(s1, s2, use_c=True)
+        assert d1 == pytest.approx(d1p)
 
 
 @numpyonly

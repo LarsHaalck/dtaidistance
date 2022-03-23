@@ -311,7 +311,7 @@ def distance_ndim(double[:, :] s1, double[:, :] s2, **kwargs):
     return dtaidistancec_dtw.dtw_distance_ndim(&s1[0,0], len(s1), &s2[0,0], len(s2), ndim, &settings._settings)
 
 
-def distance_ndim_assinglearray(double[:] s1, double[:] s2, int ndim, **kwargs):
+def distance_ndim_assinglearray(double[:, :] s1, double[:, :] s2, int ndim, **kwargs):
     """DTW distance for n-dimensional arrays.
 
     Assumes C-contiguous arrays (with sequence item as first dimension).
@@ -324,7 +324,7 @@ def distance_ndim_assinglearray(double[:] s1, double[:] s2, int ndim, **kwargs):
     """
     # Assumes C contiguous
     settings = DTWSettings(**kwargs)
-    return dtaidistancec_dtw.dtw_distance_ndim(&s1[0], len(s1), &s2[0], len(s2), ndim, &settings._settings)
+    return dtaidistancec_dtw.dtw_distance_ndim(&s1[0,0], len(s1), &s2[0,0], len(s2), ndim, &settings._settings)
 
 
 def wps_length(Py_ssize_t l1, Py_ssize_t l2, **kwargs):
@@ -338,10 +338,12 @@ def wps_width(Py_ssize_t l1, Py_ssize_t l2, **kwargs):
 
 
 def warping_paths(double[:, :] dtw, double[:] s1, double[:] s2, bint psi_neg=False, **kwargs):
-    return warping_paths_ndim(dtw, s1, s2, psi_neg, 1, **kwargs)
+    cdef double [:, :] s1_view = s1[:, None]
+    cdef double [:, :] s2_view = s2[:, None]
+    return warping_paths_ndim(dtw, s1_view, s2_view, psi_neg, 1, **kwargs)
 
 
-def warping_paths_ndim(double[:, :] dtw, double[:] s1, double[:] s2, bint psi_neg=False, ndim=1, **kwargs):
+def warping_paths_ndim(double[:, :] dtw, double[:, :] s1, double[:, :] s2, bint psi_neg=False, ndim=1, **kwargs):
     # Assumes C contiguous
     settings = DTWSettings(**kwargs)
     dtw_length = dtw.shape[0] * dtw.shape[1]
@@ -366,7 +368,7 @@ def warping_paths_ndim(double[:, :] dtw, double[:] s1, double[:] s2, bint psi_ne
     cdef double d
     # print(wps)
     # print(settings)
-    d = dtaidistancec_dtw.dtw_warping_paths_ndim(&wps_view[0,0], &s1[0], len(s1), &s2[0], len(s2),
+    d = dtaidistancec_dtw.dtw_warping_paths_ndim(&wps_view[0,0], &s1[0,0], len(s1), &s2[0,0], len(s2),
                                                  True, True, psi_neg, ndim, &settings._settings)
     # print('---')
     # print(wps)
@@ -386,11 +388,11 @@ def warping_paths_compact(double[:, :] dtw, double[:] s1, double[:] s2, bint psi
     return d
 
 
-def warping_paths_compact_ndim(double[:, :] dtw, double[:] s1, double[:] s2, bint psi_neg=False, int ndim=1, **kwargs):
+def warping_paths_compact_ndim(double[:, :] dtw, double[:, :] s1, double[:, :] s2, bint psi_neg=False, int ndim=1, **kwargs):
     # Assumes C contiguous
     settings = DTWSettings(**kwargs)
     cdef double d
-    d = dtaidistancec_dtw.dtw_warping_paths_ndim(&dtw[0,0], &s1[0], len(s1), &s2[0], len(s2),
+    d = dtaidistancec_dtw.dtw_warping_paths_ndim(&dtw[0,0], &s1[0,0], len(s1), &s2[0,0], len(s2),
                                                  True, True, psi_neg, ndim, &settings._settings)
     return d
 

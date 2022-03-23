@@ -539,6 +539,8 @@ def warping_paths_fast(s1, s2, window=None, max_dist=None, use_pruning=False,
         ndim = len(s1[0])
     else:
         ndim = 1
+        s1 = s1.reshape(-1, 1)
+        s2 = s2.reshape(-1, 1)
     if window is None:
         window = 0
     if use_pruning:
